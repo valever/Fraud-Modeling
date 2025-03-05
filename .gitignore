@@ -1,0 +1,11 @@
+*.data
+*.log
+*.txt
+*.csv
+*.json
+*.yaml
+*.yml   
+
+WIP/
+data/
+.DS_Store

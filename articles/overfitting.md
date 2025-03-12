@@ -166,7 +166,11 @@ While the lower precision might seem concerning, the model's improved stability 
 
 This analysis demonstrates that while simple downsampling isn't perfect (note the perfect training recall), it significantly reduces overfitting compared to the baseline.
 
-### 3. Cross-Validation with Dynamic Downsampling
+### 3. Cross-Validation with Dynamic Downsampling: the Ensemble Resampling technique
+This is the state of the art best practice for Fraud modeling.
+Downsampling works fine, butt the issue with doing it once for all CV is that it ends up in loosing variability and information on the negative class.
+The solution to this issue is sampling in each iteration of cross validation. The benefit of this method is that it reduces the amount of data that gets discarded in the process of under-sampling. A nice paper discovering the ensable resampling is ["Exploratory Undersampling for Class-Imbalance Learning"](https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/tsmcb09.pdf)
+
 The dynamic downsampling is implemented using scikit-learn's Pipeline and GridSearchCV, ensuring that downsampling is performed properly within each cross-validation fold:
 
 ```python

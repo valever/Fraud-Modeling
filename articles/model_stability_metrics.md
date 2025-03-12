@@ -1,4 +1,4 @@
-# Understanding Model Evaluation Metrics in Fraud Detection: Beyond Accuracy
+# Understanding Model Stability Metrics in Fraud Detection: Beyond Accuracy
 
 In the realm of fraud detection, choosing the right metrics to evaluate model performance is crucial. This article delves into various evaluation metrics, their significance in unbalanced datasets, and how they behave under different fraud scenarios.
 
@@ -129,7 +129,7 @@ Key findings:
 2. PR curves show more significant changes, reflecting their sensitivity to class imbalance
 3. Higher fraud rates generally lead to better PR-AUC scores, but this might not reflect real-world performance
 
-## Impact of Drifting Fraud Patterns
+#### Impact of Drifting Fraud Patterns
 
 Fraudsters constantly adapt their strategies, making it crucial to monitor how our model performs when fraud patterns change. This is another scenario where PR curves prove invaluable for production monitoring.
 

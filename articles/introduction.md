@@ -119,3 +119,5 @@ Fraud detection isn't just about building a model - it's about creating a system
 Remember: The goal isn't to build the perfect model (spoiler: it doesn't exist), but to create a system that effectively protects your business while keeping your customers happy.
 
 Ready to dive in? Let's get started!
+
+[TODO: reference to dataset origin]

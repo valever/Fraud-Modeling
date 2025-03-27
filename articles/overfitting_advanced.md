@@ -6,10 +6,14 @@ So you've tried the basic approaches to handling overfitting in fraud detection,
 
 This is where it gets interesting - the state-of-the-art approach for fraud modeling. The problem with doing downsampling once for all CV is that we lose variability and information on the negative class. The solution? Sample in each iteration of cross-validation. This technique was discovered in the paper ["Exploratory Undersampling for Class-Imbalance Learning"](https://cs.nju.edu.cn/zhouzh/zhouzh.files/publication/tsmcb09.pdf).
 
+This method can be implemented in many ways. For big parameter spaces Optuna works best (please, have a look at my repo for this). For the sake of simplicity, I will show the way using imblearn and scikit learn, which requires less code and it is more self contained then the optuna way.
+
 Here's how we implement it:
 
 ```python
 from imblearn.pipeline import Pipeline
+from lightgbm import LGBMClassifier
+from sklearn.model_selection import GridSearchCV
 
 hyperparameters = {
         'class__n_estimators': [20, 50, 200, 500],

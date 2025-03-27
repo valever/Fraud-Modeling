@@ -9,4 +9,5 @@
 WIP/
 data/
 .DS_Store
-models/
+models/ 
+notebooks/explenaibility/secret.json

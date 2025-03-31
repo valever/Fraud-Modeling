@@ -1,3 +1,12 @@
+"""
+Utility module for simulating and analyzing model performance under different fraud rates.
+
+This module provides tools for:
+- Creating datasets with artificially altered fraud rates
+- Analyzing how model performance changes with different fraud rates
+- Visualizing performance metrics across different fraud rate scenarios
+"""
+
 import pandas as pd
 import numpy as np
 import pickle
@@ -5,8 +14,19 @@ from sklearn.metrics import precision_recall_curve, roc_curve, auc
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.express as px
-# Load the original data
+from sklearn.base import BaseEstimator
+from plotly.graph_objects import Figure
+
 def load_data():
+    """
+    Load the original data and trained model from pickle files.
+    
+    Returns:
+        tuple: Contains:
+            - X (pd.DataFrame): Feature matrix
+            - y (pd.Series): Target labels
+            - model: Trained model object
+    """
     with open('models/oot_X.pkl', 'rb') as f:
         X = pickle.load(f)
     with open('models/oot_y.pkl', 'rb') as f:
@@ -15,9 +35,24 @@ def load_data():
         model = pickle.load(f)
     return X, y, model
 
-def create_altered_datasets(X, y, fraud_rates=[0.005, 0.01, 0.02, 0.05]):
+def create_altered_datasets(X: pd.DataFrame, y: pd.Series, fraud_rates: list[float]=[0.005, 0.01, 0.02, 0.05]) -> list[tuple[pd.DataFrame, pd.Series, str]]:
     """
-    Create datasets with different fraud rates by undersampling non-fraud cases
+    Create datasets with different fraud rates by undersampling non-fraud cases.
+    
+    This method creates multiple versions of the dataset with different fraud rates
+    by keeping all fraud cases and undersampling non-fraud cases to achieve the
+    desired fraud rate.
+    
+    Args:
+        X (pd.DataFrame): Original feature matrix
+        y (pd.Series): Original target labels
+        fraud_rates (list, optional): List of desired fraud rates. Defaults to [0.005, 0.01, 0.02, 0.05].
+        
+    Returns:
+        list: List of tuples, each containing:
+            - X_new (pd.DataFrame): Altered feature matrix
+            - y_new (pd.Series): Altered target labels
+            - label (str): Description of the fraud rate
     """
     datasets = []
     fraud_indices = np.where(y == 1)[0]
@@ -42,7 +77,21 @@ def create_altered_datasets(X, y, fraud_rates=[0.005, 0.01, 0.02, 0.05]):
     
     return datasets
 
-def plot_curves(datasets, model):
+def plot_curves(datasets: list[tuple[pd.DataFrame, pd.Series, str]], model: BaseEstimator) -> Figure:
+    """
+    Generate precision-recall and ROC curves for all altered datasets.
+    
+    This method creates a side-by-side visualization of:
+    - Precision-Recall curves with PR AUC scores
+    - ROC curves with ROC AUC scores
+    
+    Args:
+        datasets (list): List of (X, y, label) tuples from create_altered_datasets
+        model: Trained model with predict_proba method
+        
+    Returns:
+        plotly.graph_objects.Figure: Interactive figure with two subplots
+    """
     # Create subplots
     fig = make_subplots(rows=1, cols=2, 
                        subplot_titles=('Precision-Recall Curves', 'ROC Curves'),
@@ -102,6 +151,15 @@ def plot_curves(datasets, model):
     return fig
 
 def main():
+    """
+    Main execution function that runs the complete analysis pipeline.
+    
+    This method:
+    1. Loads the original data and model
+    2. Creates datasets with different fraud rates
+    3. Generates performance plots
+    4. Saves results to HTML file
+    """
     # Load data
     print("Loading data...")
     X, y, model = load_data()

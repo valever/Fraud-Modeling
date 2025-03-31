@@ -1,3 +1,11 @@
+"""
+Utility module for analyzing model performance under different fraud population shifts.
+
+This module provides tools for simulating and analyzing how model performance changes
+when the fraud population characteristics shift in different ways, while maintaining
+the same fraud rate. It helps evaluate model robustness to population drift.
+"""
+
 import pandas as pd
 import numpy as np
 import pickle
@@ -6,9 +14,32 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from sklearn.preprocessing import StandardScaler
 import plotly.express as px
+from sklearn.base import BaseEstimator
+from plotly.graph_objects import Figure
 
 class FraudPopulationShift:
-    def __init__(self, X, y, n_shifts=4):
+    """Class for analyzing model performance under different fraud population shifts.
+    
+    This class provides functionality to:
+    - Create datasets with shifted fraud populations
+    - Visualize model performance across different shifts
+    - Analyze prediction distributions under shifts
+    
+    Attributes:
+        X (pd.DataFrame): Feature matrix
+        y (np.ndarray): Target labels
+        n_shifts (int): Number of different shifts to create
+    """
+
+    def __init__(self, X: pd.DataFrame, y: np.ndarray, n_shifts: int=4):
+        """
+        Initialize the FraudPopulationShift analyzer.
+        
+        Args:
+            X (pd.DataFrame): Feature matrix
+            y (np.ndarray): Target labels
+            n_shifts (int, optional): Number of different shifts to create. Defaults to 4.
+        """
         self.X = X
         self.y = y
         self.n_shifts = n_shifts
@@ -16,7 +47,19 @@ class FraudPopulationShift:
     def create_shifted_datasets(self):
         """
         Create datasets with shifted fraud populations by applying different transformations
-        to the fraud cases while maintaining the same fraud rate
+        to the fraud cases while maintaining the same fraud rate.
+        
+        This method creates four different versions of the dataset:
+        1. Original: No shift applied
+        2. Positive Shift: All numeric features shifted up for fraud cases
+        3. Negative Shift: All numeric features shifted down for fraud cases
+        4. Mixed Shift: Random mix of up and down shifts for fraud cases
+        
+        Returns:
+            list: List of tuples, each containing:
+                - X_new (pd.DataFrame): Shifted feature matrix
+                - y_new (np.ndarray): Original labels
+                - shift_name (str): Name of the shift applied
         """
         datasets = []
     
@@ -75,7 +118,20 @@ class FraudPopulationShift:
             
         return datasets
 
-    def plot_curves(self, model):
+    def plot_curves(self, model: BaseEstimator) -> Figure:
+        """
+        Generate precision-recall and ROC curves for all shifted datasets.
+        
+        This method creates a side-by-side visualization of:
+        - Precision-Recall curves with PR AUC scores
+        - ROC curves with ROC AUC scores
+        
+        Args:
+            model: Trained model with predict_proba method
+            
+        Returns:
+            plotly.graph_objects.Figure: Interactive figure with two subplots
+        """
         # Create subplots
         fig = make_subplots(rows=1, cols=2, 
                         subplot_titles=('Precision-Recall Curves', 'ROC Curves'),
@@ -134,8 +190,20 @@ class FraudPopulationShift:
         
         return fig
 
-    def plot_prediction_distribution(self, datasets, model):
+    def plot_prediction_distribution(self, datasets: list[tuple[pd.DataFrame, np.ndarray, str]], model: BaseEstimator) -> Figure:
+        """
+        Generate histograms of prediction distributions for each shifted dataset.
         
+        This method creates a faceted histogram showing the distribution of
+        model predictions for each dataset, separated by true labels.
+        
+        Args:
+            datasets (list): List of (X, y, name) tuples from create_shifted_datasets
+            model: Trained model with predict_proba method
+            
+        Returns:
+            plotly.graph_objects.Figure: Interactive histogram plot
+        """
         # Colors for different curves
         df_list = []    
         for X, y, name in datasets:
@@ -152,6 +220,15 @@ class FraudPopulationShift:
         return fig
 
     def main(self):
+        """
+        Main execution function that runs the complete analysis pipeline.
+        
+        This method:
+        1. Loads the data
+        2. Creates shifted datasets
+        3. Generates performance plots
+        4. Saves results to HTML file
+        """
         # Load data
         print("Loading data...")
         X, y, model = load_data()

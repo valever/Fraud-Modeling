@@ -11,3 +11,4 @@ data/
 .DS_Store
 models/ 
 notebooks/explenaibility/secret.json
+notebooks/IKN/

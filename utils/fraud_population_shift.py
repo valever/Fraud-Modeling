@@ -61,21 +61,21 @@ class FraudPopulationShift:
                 - y_new (np.ndarray): Original labels
                 - shift_name (str): Name of the shift applied
         """
-        datasets = []
+        self.datasets = []
     
         # Ensure X is a DataFrame and y is a numpy array
-        if not isinstance(X, pd.DataFrame):
-            X = pd.DataFrame(X)
-        if isinstance(y, pd.Series):
-            y = y.values
+        if not isinstance(self.X, pd.DataFrame):
+            self.X = pd.DataFrame(self.X)
+        if isinstance(self.y, pd.Series):
+            self.y = self.y.values
         
         # Reset index to ensure we have clean integer indices
-        X = X.reset_index(drop=True)
+        self.X = self.X.reset_index(drop=True)
         
-        fraud_mask = y == 1
+        fraud_mask = self.y == 1
         
         # Get numeric columns for shifting
-        numeric_cols = X.select_dtypes(include=[np.number]).columns
+        numeric_cols = self.X.select_dtypes(include=[np.number]).columns
         
         # Create different shifts
         shifts = [
@@ -88,9 +88,9 @@ class FraudPopulationShift:
         for shift_name, shift_factor in shifts:
             # Create a deep copy to avoid modifying the original data
             X_new = pd.DataFrame()
-            for col in X.columns:
-                X_new[col] = X[col].copy()
-            y_new = y.copy()
+            for col in self.X.columns:
+                X_new[col] = self.X[col].copy()
+            y_new = self.y.copy()
             
             if shift_name != "Original":
                 # Apply different shifts based on the type
@@ -114,9 +114,9 @@ class FraudPopulationShift:
                 scaler = StandardScaler()
                 X_new[numeric_cols] = scaler.fit_transform(X_new[numeric_cols].astype(float))
             
-            datasets.append((X_new, y_new, shift_name))
+            self.datasets.append((X_new, y_new, shift_name))
             
-        return datasets
+        return self.datasets
 
     def plot_curves(self, model: BaseEstimator) -> Figure:
         """
@@ -140,7 +140,7 @@ class FraudPopulationShift:
         # Colors for different curves
         colors = ['blue', 'red', 'green', 'purple']
         
-        for (X, y, label), color in zip(datasets, colors):
+        for (X, y, label), color in zip(self.datasets, colors):
             # Get predictions
             y_pred_proba = model.predict_proba(X)[:, 1]
             

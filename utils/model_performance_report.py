@@ -13,6 +13,7 @@ import pandas as pd
 from sklearn.base import BaseEstimator
 import numpy as np
 from plotly.graph_objects import Figure
+from sklearn.metrics import roc_curve
 
 class ModelPerformanceReport(EvalPlots):
     """Class for generating comprehensive model performance reports.
@@ -170,3 +171,17 @@ class ModelPerformanceReport(EvalPlots):
         y_train_pred, y_train_true, y_holdout_pred, y_holdout_true, y_oot_true, y_oot_pred = self.proba_predictions(model)
         precision_train, recall_train, precision_holdout, recall_holdout, precision_oot, recall_oot = self.precision_recall_calc(y_train_true, y_train_pred, y_holdout_true, y_holdout_pred, y_oot_true, y_oot_pred)
         return self.plot_eval_pr_auc(precision_train, recall_train, precision_holdout, recall_holdout, precision_oot, recall_oot) 
+
+    def produce_roc_auc_report(self, model: BaseEstimator) -> Figure:
+        """
+        Generate a report showing ROC curves with AUC scores.
+        
+        Args:
+            model: Trained model with predict_proba method
+            
+        Returns:
+            Figure: Interactive plot showing ROC curves across datasets
+        """
+        y_train_pred, y_train_true, y_holdout_pred, y_holdout_true, y_oot_true, y_oot_pred = self.proba_predictions(model)
+
+        return self.plot_eval_roc_auc(y_train_true, y_train_pred, y_holdout_true, y_holdout_pred, y_oot_true, y_oot_pred)
